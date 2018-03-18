@@ -1,15 +1,29 @@
 import React, {Component} from 'react'
 import TodoList from '../components/TodoList';
 import {connect} from 'react-redux';
+import { toggleTodo, VisibilityFilters } from '../actions';
+import { createSelector } from 'reselect';
 
-class VisbleTodoList extends Component {
-    todos = [
-        { id: 1, text: 'foo'},
-        { id: 2, text: 'bar'}
-    ]
-    render(){
-        return <TodoList todos={this.props.todos}/>
+const getVisibleTodos = (todos, filter) => {
+    switch(filter){
+        case VisibilityFilters.SHOW_COMPLETED:
+            return todos.filter(t => t.completed)
+        case VisibilityFilters.SHOW_ACTIVE:
+            return todos.filter(t => !t.completed)
+        default:
+            return todos
     }
 }
-const mapStatToProps = (state) => ({todos: state})
-export default connect(mapStatToProps)(VisbleTodoList);
+const todosSelector = (state) => state.todos
+const visibilityFilterSelector = (state) => state.visibilityFilter
+const getVisibileTodosSelector = createSelector([todosSelector, visibilityFilterSelector],
+    (todos, visibilityFilter) => getVisibleTodos(todos, visibilityFilter)
+)
+
+const mapStateToProps = (state) => ({
+    todos: getVisibleTodos(state.todos,state.visibilityFilter)
+})
+const mapDispatchToProps = (dispatch) => ({
+    toggleTodo: (id) => dispatch(toggleTodo(id))
+})
+export default connect(mapStateToProps, mapDispatchToProps)(TodoList);

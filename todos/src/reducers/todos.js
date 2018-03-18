@@ -1,19 +1,22 @@
 const initial = [
-    { id: 1, text: 'foo'},
-    { id: 2, text: 'bar'}  
+    { id: 1, text: 'foo', completed: false },
+    { id: 2, text: 'bar', completed: false }
 ];
-
 const todos = (state = initial, action) => {
     switch(action.type){
-        case 'ADD_TODO' :
-        // let todos = state.todos
-        // todos.push({id:action.id, text: action.text})
-        console.log(action.id)
-        return [...state, {
-            id:action.id,
-            text:action.text
-        }]
+        case 'ADD_TODO':
+            return [...state, {
+                id: action.id,
+                text: action.text
+            }]
+        case 'TOGGLE_TODO':            
+            return state.map(t => 
+                (t.id === action.id)
+                ? {...t, completed: !t.completed}
+                : t
+            )
+        default:
+            return state
     }
-    return state
 }
-export default todos
+export default todos;
